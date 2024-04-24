@@ -24,3 +24,4 @@ db.contacts = require("./contact.model.js")(sequelize, Sequelize);
 db.phones = require("./phone.model.js")(sequelize, Sequelize);
 
 module.exports = db;
+module.exports = db;
