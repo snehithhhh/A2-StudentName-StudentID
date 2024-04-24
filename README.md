@@ -41,6 +41,18 @@ By following the procedure Task 1 - Task 3, you can reach maximum marks of 60. T
 ```javascript
 // You need to put your code contact.model.js here
 //and explain as much as you can
+module.exports = (sequelize, Sequelize) => {
+   const Contact = sequelize.define("contact", {
+      id: {
+         type: Sequelize.INTEGER,
+         autoIncrement: true,
+         primaryKey: true,
+      },
+
+   });
+
+   return Contact;
+};
 
 ```
 

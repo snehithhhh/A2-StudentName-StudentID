@@ -5,8 +5,7 @@ module.exports = (sequelize, Sequelize) => {
             autoIncrement: true,
             primaryKey: true,
         },
-        name
-        adress
+
     });
   
     return Contact;
