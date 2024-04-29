@@ -3,7 +3,7 @@
 ## General Instruction
 
 1. Clone this repository on your local repository straight away, so you can modify the code in your local repository.
-2. Ensure that every commit made in your local repository is pushed to your GitHub repository. 
+2. Ensure that every commit made in your local repository is pushed to your GitHub repository.
 3. Your commits should accurately reflect your assignment progress and serve as a reference for tracking your work.
 
 ## General Deadline
@@ -15,29 +15,28 @@
 3. Deadline Task 3: Monday week 12 / 27th May 2024 (30 marks) - **User Interface using React Component**
 
 4. Deadline Task 4: Monday week 12 / 27th May 2024 (40 marks) - **Innovation**.
-    For this case (Task 4 - Innovation, you should be able 
-    to create a new design using new models - 
-    not phone and contact). This effort should be initiated from the early phase. Need to be consulted by me.
+   For this case (Task 4 - Innovation, you should be able
+   to create a new design using new models -
+   not phone and contact). This effort should be initiated from the early phase. Need to be consulted by me.
 
-By following the procedure Task 1 - Task 3, you can reach maximum marks of 60. To get the bonus (Task 4), you need to design the new schema, using different database platfrom, applying the update button, and much more functionalities. You need to consult with the lecturer to apply this. 
+By following the procedure Task 1 - Task 3, you can reach maximum marks of 60. To get the bonus (Task 4), you need to design the new schema, using different database platfrom, applying the update button, and much more functionalities. You need to consult with the lecturer to apply this.
 ## Task 1 - Define the model (5 Marks)
 ### Marking Criteria ###
 
-1. Provide the GitHub username and clone to your local repository following this link (1 mark) 
+1. Provide the GitHub username and clone to your local repository following this link (1 mark)
 
 2. Complete the creation of js files under the model's folder (4 mark) - subject to Documentation (explanation)
 
 3. Your elaboration is not limited to expalanation of:
 
-    a. What is the purpose of this Sequelize model?
+   a. What is the purpose of this Sequelize model?
 
-    b. How postgresql is created inside the docker container? In which part of code?
+   b. How postgresql is created inside the docker container? In which part of code?
 
 ### Explanation about the Contact and Phone Model (Adjust the model if you decided to do up to Task 4) ###
 
 
 **Contact Model Code**
-
 ```javascript
 // You need to put your code contact.model.js here
 //and explain as much as you can
@@ -48,44 +47,75 @@ module.exports = (sequelize, Sequelize) => {
          autoIncrement: true,
          primaryKey: true,
       },
-
+      name : {
+         type: Sequelize.STRING
+      },
+      address: {
+         type: Sequelize.STRING
+      },
    });
 
    return Contact;
 };
-
 ```
 
 > Explanation: Your explanation
-> 
+>
 > Something that you can consider:
-> What does each attribute in the Contact model represent? 
-> What type of data does each attribute hold? 
-> What are the constraints applied to each attribute? 
+> What does each attribute in the Contact model represent?
+> The contact name represent the first
+>
+> What type of data does each attribute hold?
+> What are the constraints applied to each attribute?
 > What is the significance of the autoIncrement: true property for the id attribute?
-> - Point 1 
+> - Point 1
 > - Point 2
-> - 
+> -
 >End of Explanation
 
 
 
 **Phone Model Code**
 
+
 ```javascript
-// You need to put your code phone.model.js here
-//
+// You need to put your code contact.model.js here
+//and explain as much as you can
+module.exports = (sequelize, Sequelize) => {
+   const Phone = sequelize.define("phone", {
+      id: {
+         type: Sequelize.INTEGER,
+         autoIncrement: true,
+         primaryKey: true,
+      },
+      phonetype: {
+         type: Sequelize.STRING
+      },
+      number: {
+         type: Sequelize.STRING
+      },
+      contactId: {
+         type: Sequelize.INTEGER,
+         references: {
+            model: 'contacts',
+            key: 'id',
+         }
+      }
+   });
+
+   return Phone;
+};
 ```
 
 > Explanation: Your explanation
 >
 > Something that you can consider:
 > What does each attribute in the Phone model represent?
-> 
+>
 > What type of data does each attribute hold?
-> 
+>
 > What are the constraints applied to each attribute?
-> 
+>
 > What is the significance of the autoIncrement: true property for the id attribute?
 erty for the id attribute?
 >
@@ -101,12 +131,228 @@ erty for the id attribute?
 
 ```javascript
 // You need to put your code contact.controller.js here
+const db = require("../models");
+const Contacts = db.contacts;
+const Phones = db.phones;
+const Op = db.Sequelize.Op;
+
+// Create contact
+exports.create = (req, res) => {
+   const contact = {
+      name: req.body.name,
+      address: req.body.address,
+   };
+
+   Contacts.create(contact)
+           .then(data => {
+              res.send(data);
+           })
+           .catch(err => {
+              res.status(500).send({
+                 message:
+                         err.message || "Some error occurred"
+              });
+           });
+};
+
+// Get all contacts
+exports.findAll = (req, res) => {
+   Contacts.findAll()
+           .then(data => {
+              res.send(data);
+           })
+           .catch(err => {
+              res.status(500).send({
+                 message: err.message || "Some error occurred"
+              });
+           });
+};
+
+// Get one contact by id
+exports.findOne = (req, res) => {
+   const id = req.params.contactId;
+
+   Contacts.findByPk(id)
+           .then(data => {
+              res.send(data);
+           })
+           .catch(err => {
+                      res.status(500).send({
+                         message: "Error retrieving Contact with id=" + id
+                      });
+                   }
+           );
+};
+
+// Update one contact by id
+exports.update = (req, res) => {
+   const id = req.params.contactId;
+
+   Contacts.update(req.body, {
+      where: { id: id }
+   })
+           .then(num => {
+              if (num == 1) {
+                 res.send({
+                    message: "Contact was updated successfully."
+                 });
+              } else {
+                 res.send({
+                    message: `Cannot update Contact`
+                 });
+              }
+           })
+           .catch(err => {
+              res.status(500).send({
+                 message: "Error updating Contact with id=" + id
+              });
+           });
+};
+
+// Delete one contact by id
+exports.delete = (req, res) => {
+   const id = parseInt(req.params.contactId);
+
+   Phones.destroy({
+      where: { contactId: id }
+   })
+           .then(num => {
+              Contacts.destroy({
+                 where: { id: id }
+              })
+                      .then(num => {
+                         if (num == 1) {
+                            res.send({
+                               message: "Contact was deleted successfully!"
+                            });
+                         } else {
+                            res.send({
+                               message: `Cannot delete Contact`
+                            });
+                         }
+                      })
+                      .catch(err => {
+                         res.status(500).send({
+                            message: "Could not delete Contact with id=" + id
+                         });
+                      });
+           });
+};
 
 //
 ```
 
 ```javascript
 // You need to put your code phones.controller.js here
+const db = require("../models");
+const Phones = db.phones;
+const Op = db.Sequelize.Op;
+
+// Create phone
+exports.create = (req, res) => {
+   const phone = {
+      phonetype: req.body.phonetype,
+      number: req.body.number,
+      contactId: parseInt(req.params.contactId)
+   };
+
+   Phones.create(phone)
+           .then(data => {
+              res.send(data);
+           })
+           .catch(err => {
+              res.status(500).send({
+                 message:
+                         err.message || "Some error occurred"
+              });
+           });
+};
+
+// Get all phones
+exports.findAll = (req, res) => {
+
+   Phones.findAll({
+      where: {
+         contactId: parseInt(req.params.contactId)
+      }
+   })
+           .then(data => {
+              res.send(data);
+           })
+           .catch(err => {
+              res.status(500).send({
+                 message: err.message || "Some error occurred"
+              });
+           });
+};
+
+// Get one phone by id
+exports.findOne = (req, res) => {
+   Phones.findOne({
+      where: {
+         contactId: req.params.contactId,
+         id: req.params.phoneId
+      }
+   })
+           .then(data => {
+              res.send(data);
+           })
+           .catch(err => {
+              res.status(500).send({
+                 message: err.message || "Some error occurred"
+              });
+           });
+};
+
+// Update one phone by id
+exports.update = (req, res) => {
+   const id = req.params.phoneId;
+
+   Phones.update(req.body, {
+      where: { id: id, contactId: req.params.contactId }
+   })
+           .then(num => {
+              if (num == 1) {
+                 res.send({
+                    message: "PhoneSummary was updated successfully."
+                 });
+              } else {
+                 res.send({
+                    message: `Cannot update Phone`
+                 });
+              }
+           })
+           .catch(err => {
+              res.status(500).send({
+                 message: "Error updating PhoneSummary with id=" + id
+              });
+           });
+};
+
+// Delete one phone by id
+exports.delete = (req, res) => {
+   const id = req.params.phoneId;
+
+   Phones.destroy({
+      where: { id: id, contactId: req.params.contactId }
+   })
+           .then(num => {
+              if (num == 1) {
+                 res.send({
+                    message: "PhoneSummary was deleted successfully!"
+                 });
+              } else {
+                 res.send({
+                    message: `Cannot delete Phone`
+                 });
+              }
+           })
+           .catch(err => {
+              res.status(500).send({
+                 message: "Could not delete PhoneSummary with id=" + id
+              });
+           });
+};
 
 //
 ```
@@ -115,6 +361,29 @@ erty for the id attribute?
 ```javascript
 // You need to put your code stats.controller.js here
 
+const db = require("../models");
+const Phones = db.phones;
+const Contacts = db.contacts;
+const Op = db.Sequelize.Op;
+
+exports.calculate = (req, res) => {
+   Contacts.count().then(totalContacts => {
+      Phones.count().then(totalPhones => {
+         Contacts.max('updatedAt').then(lastUpdatedContact => {
+            Contacts.min('createdAt').then(oldestContact => {
+               res.send({
+                  totalContacts: totalContacts,
+                  totalPhones: totalPhones,
+                  lastUpdatedContact: lastUpdatedContact,
+                  oldestContact: oldestContact
+               });
+            });
+         });
+      });
+   });
+
+};
+
 //
 ```
 
@@ -122,7 +391,7 @@ erty for the id attribute?
 1. **Understanding of Controller Functions (6 Marks)**
    - Explain the purpose of each controller function (create, findAll, findOne, update, delete).
    - Explanations of what each function does.
-   
+
    > Explanation: Your explanation
    :>
    > - Point 1
@@ -151,7 +420,7 @@ erty for the id attribute?
    >
    > End of Explanation
 
-**Routes Code (10 Marks)** 
+**Routes Code (10 Marks)**
 
 1. **Understanding of Route Setup (2 Marks)**
    - Correctly explains the purpose of each route setup.
@@ -167,7 +436,7 @@ erty for the id attribute?
    - Demonstrates understanding of RESTful principles in defining endpoints.
    - Explains the HTTP methods used for each endpoint (POST, GET, PUT, DELETE).
    > Explanation: Your explanation
-     :>
+   :>
    > - Point 1
    > - Point 2
    >
@@ -177,7 +446,7 @@ erty for the id attribute?
    - Demonstrates understanding of RESTful principles in defining endpoints.
    - Explains the HTTP methods used for each endpoint (POST, GET, PUT, DELETE).
    > Explanation: Your explanation
-     :>
+   :>
    > - Point 1
    > - Point 2
    >
@@ -205,7 +474,7 @@ erty for the id attribute?
 1. **Understanding of React Component Structure (5 Marks)**
    - Identifies and explains the basic structure of a React functional component.
    - Describes the purpose of each section of the component (state, functions, JSX rendering).
-    > Explanation: Your explanation
+   > Explanation: Your explanation
    :>
    > - Point 1
    > - Point 2
@@ -261,7 +530,7 @@ erty for the id attribute?
    - Explains how the response from the backend API is handled (`data.id`).
    - Describes how the component state (`contacts`, `setContacts`, `name`, `setName`, `address`, `setAddress`) is managed and updated.
    > Explanation: Your explanation
-:>
+   :>
    > - Point 1
    > - Point 2
    >
@@ -278,8 +547,8 @@ erty for the id attribute?
    >
    > End of Explanation
 3. Containerization of Components.
-Explains how Docker containers are used to encapsulate different components such as the React app, database, and API.
-Interactions between Components (2 Marks)
+   Explains how Docker containers are used to encapsulate different components such as the React app, database, and API.
+   Interactions between Components (2 Marks)
    > Explanation: Your explanation
    :>
    > - Point 1
@@ -287,7 +556,7 @@ Interactions between Components (2 Marks)
    >
    > End of Explanation
 3. Describes how Docker enables communication between components.
-Discusses networking and linking mechanisms used to connect the React app with the API and database. (2 Marks)
+   Discusses networking and linking mechanisms used to connect the React app with the API and database. (2 Marks)
    > Explanation: Your explanation
    :>
    > - Point 1
@@ -302,6 +571,6 @@ Discusses networking and linking mechanisms used to connect the React app with t
 - The explanations should demonstrate a solid understanding of React component structure, JS, state management, and interaction with backend APIs.
 - Use of appropriate technical terminology and clarity of expression will be considered in assessment.
 - Maximum marks for each criterion may be divided among sub-criteria based on the depth of understanding demonstrated.
-- **Marks for each task will be allocated based on how much of the required functionalities the students have successfully implemented. If a student only partially implements the required features, their marks will reflect the proportion of the code that was successfully applied.** 
+- **Marks for each task will be allocated based on how much of the required functionalities the students have successfully implemented. If a student only partially implements the required features, their marks will reflect the proportion of the code that was successfully applied.**
 
 ---
