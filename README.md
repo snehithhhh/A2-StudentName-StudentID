@@ -214,7 +214,59 @@ erty for the id attribute?
 ```javascript
 // You need to put every code of js here e.g. Contact js
 
-//
+//import React, { useState } from 'react';
+
+function AddContact({ onAdd }) {
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onAdd({ name, address });
+    setName('');
+    setAddress('');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Address"
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+      />
+      <button type="submit">Add Contact</button>
+    </form>
+  );
+}
+
+export default AddContact;
+
+// Contact.js
+import React from 'react';
+
+function Contact({ contacts }) {
+  return (
+    <div>
+      <h2>Contact List</h2>
+      <ul>
+        {contacts.map((contact, index) => (
+          <li key={index}>
+            {contact.name} - {contact.address}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default Contact;za
 ```
 
 ```javascript
