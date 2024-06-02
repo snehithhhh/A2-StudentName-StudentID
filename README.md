@@ -131,6 +131,44 @@ erty for the id attribute?
 
 ```javascript
 // You need to put your code contact.controller.js here
+[4:33 pm, 1/6/2024] Gaurav La Trobe: import { useState, useEffect } from 'react';  // import useEffect
+import AddContact from './AddContact';
+import Contact from './Contact';
+import Stats from './Stats';
+import './App.css';
+function App() {
+    const [contacts, setContacts] = useState([]);
+
+    const addContact = (newContact) => {
+      setContacts([...contacts, newContact]);
+    };
+    return (
+        <div>     
+            <h1>Patient Details</h1>
+            <AddContact onAdd={addContact} />
+            <Contact contacts={contacts} />
+            <Stats contacts={contacts} />
+        </div>
+    );
+}
+
+export default App;
+
+
+// Stats.js
+import React from 'react';
+
+function Stats({ contacts }) {
+  return (
+    <div>
+      <h2>Contact Statistics</h2>
+      <p>Total Contacts: {contacts.length}</p>
+      
+    </div>
+  );
+}
+
+export default Stats;
 
 ```
 
@@ -151,8 +189,28 @@ erty for the id attribute?
 
    > Explanation: Your explanation
    :>
-   > - Point 1
-   > - Point 2
+   > - 1. Create - It creates or adds new resource to the system
+   > - 
+   > - receives new data
+     - validates the given data
+     - responds to the required query
+   2. FindAll- To find all the reaources
+    - uses GET response to find the resources
+    - Returns the response containing all the list data
+    3. FindOne - To find any one particular single resource by using its identifier
+    - GET request with parameters
+    - validates
+    4. Update -  to change the existing resources
+    5. Delete - to remove the resources from the system or list
+    
+
+   >
+   > End of Explanation
+
+
+
+2. **Understanding of Sequelize Usage (6 Marks)**
+   - Describes the usage of 
    >
    > End of Explanation
 
