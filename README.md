@@ -131,44 +131,60 @@ erty for the id attribute?
 
 ```javascript
 // You need to put your code contact.controller.js here
-[4:33 pm, 1/6/2024] Gaurav La Trobe: import { useState, useEffect } from 'react';  // import useEffect
-import AddContact from './AddContact';
-import Contact from './Contact';
-import Stats from './Stats';
-import './App.css';
-function App() {
-    const [contacts, setContacts] = useState([]);
+import React, { useState } from 'react';
 
-    const addContact = (newContact) => {
-      setContacts([...contacts, newContact]);
-    };
-    return (
-        <div>     
-            <h1>Patient Details</h1>
-            <AddContact onAdd={addContact} />
-            <Contact contacts={contacts} />
-            <Stats contacts={contacts} />
-        </div>
-    );
+function AddContact({ onAdd }) {
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onAdd({ name, address });
+    setName('');
+    setAddress('');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Address"
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+      />
+      <button type="submit">Add Contact</button>
+    </form>
+  );
 }
 
-export default App;
+export default AddContact;
 
-
-// Stats.js
+// Contact.js
 import React from 'react';
 
-function Stats({ contacts }) {
+function Contact({ contacts }) {
   return (
     <div>
-      <h2>Contact Statistics</h2>
-      <p>Total Contacts: {contacts.length}</p>
-      
+      <h2>Contact List</h2>
+      <ul>
+        {contacts.map((contact, index) => (
+          <li key={index}>
+            {contact.name} - {contact.address}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
-export default Stats;
+export default Contact;
+
 
 ```
 
